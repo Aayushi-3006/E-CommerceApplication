@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success - E-Commerce Store</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-content">
+            <div class="success-icon">
+                <div class="checkmark-circle">
+                    <span class="checkmark">✓</span>
+                </div>
+            </div>
+            
+            <h1 class="success-title">Order Placed Successfully!</h1>
+            <p class="success-message">
+                Thank you for your purchase! Your order has been confirmed and will be processed shortly.
+            </p>
+            
+            <div class="order-details">
+                <div class="detail-item">
+                    <span class="detail-label">Order ID:</span>
+                    <span class="detail-value">#ORD-${Date.now().toString().slice(-6)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Estimated Delivery:</span>
+                    <span class="detail-value">3-5 business days</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Payment Method:</span>
+                    <span class="detail-value">Credit Card</span>
+                </div>
+            </div>
+            
+            <div class="success-actions">
+                <button class="continue-shopping-btn" onclick="window.location.href='index.html'">
+                    <span class="btn-icon">🛍️</span>
+                    <span class="btn-text">Continue Shopping</span>
+                </button>
+                <button class="view-orders-btn" onclick="window.location.href='orders.html'">
+                    <span class="btn-icon">📋</span>
+                    <span class="btn-text">View Orders</span>
+                </button>
+            </div>
+            
+            <div class="success-footer">
+                <p>You will receive an email confirmation shortly with your order details.</p>
+                <div class="contact-info">
+                    <span>Need help? Contact us at</span>
+                    <a href="mailto:support@ecommerce.com">support@ecommerce.com</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add some animation on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const successContent = document.querySelector('.success-content');
+            successContent.style.opacity = '0';
+            successContent.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                successContent.style.transition = 'all 0.6s ease-out';
+                successContent.style.opacity = '1';
+                successContent.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

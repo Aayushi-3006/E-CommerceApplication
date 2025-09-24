@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sign In - ShopHub</title>
+	<link rel="stylesheet" href="styles.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<div class="auth-container">
+		<div class="auth-wrapper">
+			<div class="auth-left">
+				<div class="auth-branding">
+					<div class="brand-logo-large">
+						<div class="logo-icon-large">🛍️</div>
+						<h1>ShopHub</h1>
+					</div>
+					<h2>Welcome Back!</h2>
+					<p>Sign in to continue your shopping journey</p>
+					<div class="auth-features">
+						<div class="feature-item">
+							<span class="feature-icon">🚚</span>
+							<span>Free & Fast Delivery</span>
+						</div>
+						<div class="feature-item">
+							<span class="feature-icon">🔒</span>
+							<span>Secure Shopping</span>
+						</div>
+						<div class="feature-item">
+							<span class="feature-icon">💳</span>
+							<span>Easy Checkout</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="auth-right">
+				<div class="auth-card">
+					<div class="auth-header">
+						<h2>Sign In</h2>
+						<p>Enter your credentials to access your account</p>
+					</div>
+			
+			<form id="login-form" class="auth-form">
+				<div class="form-group">
+					<label for="email" class="required">Email Address</label>
+					<input type="email" id="email" name="email" required placeholder="Enter your email">
+					<div class="error-message" id="email-error"></div>
+				</div>
+				
+				<div class="form-group">
+					<label for="password" class="required">Password</label>
+					<div class="password-input">
+						<input type="password" id="password" name="password" required placeholder="Enter your password">
+						<button type="button" class="password-toggle" id="password-toggle">👁️</button>
+					</div>
+					<div class="error-message" id="password-error"></div>
+				</div>
+
+				<div class="form-group">
+					<div class="image-captcha-container">
+						<label for="image-captcha">Security Verification</label>
+						<p class="captcha-instruction">Click on the correct image to verify you're human</p>
+						<div class="image-captcha-grid" id="image-captcha-grid">
+							<!-- Images will be generated here -->
+						</div>
+						<div class="captcha-actions">
+							<button type="button" class="captcha-refresh-btn" id="image-captcha-refresh">
+								<span class="refresh-icon">🔄</span>
+								<span class="refresh-text">New Challenge</span>
+							</button>
+							<div class="captcha-status" id="captcha-status">Select the correct image</div>
+						</div>
+						<div class="error-message" id="image-captcha-error"></div>
+					</div>
+				</div>
+
+				<div class="form-options">
+					<label class="checkbox-label remember-me">
+						<input type="checkbox" id="remember">
+						<span class="checkmark"></span>
+						<span class="remember-text">Remember me</span>
+					</label>
+					<a href="#" class="forgot-password" id="forgot-password">Forgot Password?</a>
+				</div>
+				
+				<button type="submit" class="auth-btn primary">
+					<span class="btn-text">Sign In</span>
+					<span class="btn-loading" id="login-loading">⏳</span>
+				</button>
+			</form>
+			
+					<div class="auth-footer">
+						<p>Don't have an account? <a href="signup.html" class="auth-link">Create Account</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Forgot Password Modal -->
+	<div class="modal" id="forgot-modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Reset Password</h3>
+				<button class="modal-close" id="forgot-close">✕</button>
+			</div>
+			<div class="modal-body">
+				<p>Enter your email address and we'll send you a reset code.</p>
+				<form id="forgot-form">
+					<div class="form-group">
+						<label for="forgot-email">Email Address</label>
+						<input type="email" id="forgot-email" required placeholder="Enter your email">
+						<div class="error-message" id="forgot-email-error"></div>
+					</div>
+					<button type="submit" class="auth-btn primary">
+						<span class="btn-text">Send Reset Code</span>
+						<span class="btn-loading" id="forgot-loading">⏳</span>
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<script src="email-service.js"></script>
+	<script src="auth.js"></script>
+	<script src="validation.js"></script>
+	<script>
+		// Enhanced login form with improved validation
+		document.addEventListener('DOMContentLoaded', function() {
+			const form = document.getElementById('login-form');
+			
+			// Password toggle functionality
+			document.getElementById('password-toggle').addEventListener('click', function() {
+				const passwordInput = document.getElementById('password');
+				const toggle = this;
+				if (passwordInput.type === 'password') {
+					passwordInput.type = 'text';
+					toggle.textContent = '🙈';
+				} else {
+					passwordInput.type = 'password';
+					toggle.textContent = '👁️';
+				}
+			});
+			
+			// Form submission with validation
+			form.addEventListener('submit', function(e) {
+				e.preventDefault();
+				
+				// Validate all fields
+				const isFormValid = window.FormValidator.validateForm(form);
+				
+				// Check captcha
+				if (!isCaptchaVerified) {
+					window.FormValidator.showError(document.getElementById('image-captcha-grid'), 'Please complete the security verification');
+					return;
+				}
+				
+				if (isFormValid) {
+					// Get form data
+					const formData = {
+						email: document.getElementById('email').value.trim().toLowerCase(),
+						password: document.getElementById('password').value
+					};
+					
+					// Show loading state
+					const submitBtn = form.querySelector('.auth-btn');
+					const originalText = submitBtn.querySelector('.btn-text').textContent;
+					submitBtn.querySelector('.btn-text').textContent = 'Signing In...';
+					submitBtn.disabled = true;
+					
+					// Simulate login
+					setTimeout(() => {
+						try {
+							// This would normally call the actual login function
+							// For now, we'll just show success
+							alert('Login successful!');
+							window.location.href = 'index.html';
+						} catch (error) {
+							alert('Login failed: ' + error.message);
+							submitBtn.querySelector('.btn-text').textContent = originalText;
+							submitBtn.disabled = false;
+						}
+					}, 1500);
+				}
+			});
+		});
+		
+		
+		// Forgot password modal
+		const forgotModal = document.getElementById('forgot-modal');
+		const forgotBtn = document.getElementById('forgot-password');
+		const forgotClose = document.getElementById('forgot-close');
+		
+		forgotBtn.addEventListener('click', (e) => {
+			e.preventDefault();
+			forgotModal.style.display = 'flex';
+		});
+		
+		forgotClose.addEventListener('click', () => {
+			forgotModal.style.display = 'none';
+		});
+		
+		// Forgot password form
+		document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			
+			const email = document.getElementById('forgot-email').value;
+			const loading = document.getElementById('forgot-loading');
+			const btnText = document.querySelector('#forgot-form .btn-text');
+			
+			loading.style.display = 'inline';
+			btnText.style.display = 'none';
+			
+			try {
+				const result = await window.Auth.sendPasswordResetEmail(email);
+				if (result.success) {
+					alert(result.message);
+					forgotModal.style.display = 'none';
+					document.getElementById('forgot-email').value = '';
+				}
+			} catch (error) {
+				alert('Error: ' + error.message);
+			} finally {
+				loading.style.display = 'none';
+				btnText.style.display = 'inline';
+			}
+		});
+		
+		// Image-based Captcha System
+		let currentChallenge = '';
+		let selectedImages = [];
+		let isCaptchaVerified = false;
+		
+		const captchaChallenges = [
+			{ question: "Select all images with cars", correctImages: ["🚗", "🚌", "🚙", "🚐"] },
+			{ question: "Select all images with trees", correctImages: ["🌳", "🌲", "🌿", "🌴"] },
+			{ question: "Select all images with buildings", correctImages: ["🏢", "🏪", "🏬", "🏭", "🏠", "🏘️", "🏡", "🏛️"] },
+			{ question: "Select all images with animals", correctImages: ["🐕", "🐱", "🐶", "🐰"] },
+			{ question: "Select all images with food", correctImages: ["🍕", "🍔", "🍎", "🍝"] }
+		];
+		
+		const captchaImages = [
+			"🚗", "🌳", "🏢", "🍕", "🐕", "🏠", "🚌", "🌲", "🏪", "🍔", "🐱", "🏡",
+			"🚙", "🌿", "🏬", "🍎", "🐶", "🏘️", "🚐", "🌴", "🏭", "🍝", "🐰", "🏛️"
+		];
+		
+		let currentCorrectIndices = [];
+		
+		function generateImageCaptcha() {
+			const challenge = captchaChallenges[Math.floor(Math.random() * captchaChallenges.length)];
+			currentChallenge = challenge;
+			selectedImages = [];
+			isCaptchaVerified = false;
+			currentCorrectIndices = [];
+			
+			// Update instruction
+			document.querySelector('.captcha-instruction').textContent = challenge.question;
+			document.getElementById('captcha-status').textContent = 'Select the correct images';
+			document.getElementById('captcha-status').className = 'captcha-status';
+			
+			// Generate 6 images ensuring at least 2-3 correct images are included
+			const grid = document.getElementById('image-captcha-grid');
+			grid.innerHTML = '';
+			
+			// First, select 2-3 correct images
+			const correctImagesToUse = challenge.correctImages.sort(() => Math.random() - 0.5).slice(0, Math.min(3, challenge.correctImages.length));
+			
+			// Then select 3-4 random other images
+			const otherImages = captchaImages.filter(img => !challenge.correctImages.includes(img));
+			const randomOtherImages = otherImages.sort(() => Math.random() - 0.5).slice(0, 6 - correctImagesToUse.length);
+			
+			// Combine and shuffle
+			const shuffledImages = [...correctImagesToUse, ...randomOtherImages].sort(() => Math.random() - 0.5);
+			
+			// Find which indices contain correct images
+			shuffledImages.forEach((image, index) => {
+				if (challenge.correctImages.includes(image)) {
+					currentCorrectIndices.push(index);
+				}
+			});
+			
+			shuffledImages.forEach((image, index) => {
+				const imageDiv = document.createElement('div');
+				imageDiv.className = 'captcha-image';
+				imageDiv.innerHTML = `<div class="image-content">${image}</div>`;
+				imageDiv.dataset.index = index;
+				
+				imageDiv.addEventListener('click', function() {
+					selectImage(index, this);
+				});
+				
+				grid.appendChild(imageDiv);
+			});
+		}
+		
+		function selectImage(index, element) {
+			if (isCaptchaVerified) return;
+			
+			const isSelected = selectedImages.includes(index);
+			
+			if (isSelected) {
+				selectedImages = selectedImages.filter(i => i !== index);
+				element.classList.remove('selected');
+			} else {
+				selectedImages.push(index);
+				element.classList.add('selected');
+			}
+			
+			// Check if selection matches correct answers
+			const isCorrect = selectedImages.length === currentCorrectIndices.length && 
+							 selectedImages.every(i => currentCorrectIndices.includes(i));
+			
+			if (isCorrect && selectedImages.length > 0) {
+				isCaptchaVerified = true;
+				document.getElementById('captcha-status').textContent = '✓ Verification successful!';
+				document.getElementById('captcha-status').className = 'captcha-status success';
+			} else if (selectedImages.length > 0) {
+				document.getElementById('captcha-status').textContent = 'Please select all correct images';
+				document.getElementById('captcha-status').className = 'captcha-status warning';
+			}
+		}
+		
+		// Initialize captcha
+		generateImageCaptcha();
+		
+		// Refresh captcha
+		document.getElementById('image-captcha-refresh').addEventListener('click', function() {
+			generateImageCaptcha();
+			document.getElementById('image-captcha-error').textContent = '';
+		});
+
+		// Login form
+
+		document.getElementById('login-form').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			
+			const formData = new FormData(e.target);
+			const email = formData.get('email');
+			const password = formData.get('password');
+			const loading = document.getElementById('login-loading');
+			const btnText = document.querySelector('#login-form .btn-text');
+			
+			// Clear previous errors
+			document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+			
+			// Validate image captcha
+			if (!isCaptchaVerified) {
+				document.getElementById('image-captcha-error').textContent = 'Please complete the image verification';
+				return;
+			}
+			
+			loading.style.display = 'inline';
+			btnText.style.display = 'none';
+			
+			try {
+				console.log('Attempting login with:', { email, password: '***' });
+				await window.Auth.loginUser({ email, password });
+				console.log('Login successful!');
+				
+				// Get next parameter from URL
+				const urlParams = new URLSearchParams(window.location.search);
+				const next = urlParams.get('next') || 'index.html';
+				console.log('Redirecting to:', next);
+				
+				// Add a small delay to ensure the session is saved
+				setTimeout(() => {
+					console.log('About to redirect to:', next);
+					console.log('Current auth status:', window.Auth.isAuthenticated());
+					window.location.href = next;
+				}, 100);
+			} catch (error) {
+				console.error('Login failed:', error);
+				alert('Login failed: ' + error.message);
+			} finally {
+				loading.style.display = 'none';
+				btnText.style.display = 'inline';
+			}
+		});
+		
+	</script>
+</body>
+</html>

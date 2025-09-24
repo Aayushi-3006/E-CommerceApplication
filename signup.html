@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Create Account - ShopHub</title>
+	<link rel="stylesheet" href="styles.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<div class="auth-container">
+		<div class="auth-wrapper">
+			<div class="auth-left">
+				<div class="auth-branding">
+					<div class="brand-logo-large">
+						<div class="logo-icon-large">🛍️</div>
+						<h1>ShopHub</h1>
+					</div>
+					<h2>Join ShopHub Today!</h2>
+					<p>Create your account and start your shopping journey</p>
+					<div class="auth-features">
+						<div class="feature-item">
+							<span class="feature-icon">🎁</span>
+							<span>Exclusive Offers</span>
+						</div>
+						<div class="feature-item">
+							<span class="feature-icon">⭐</span>
+							<span>Personalized Experience</span>
+						</div>
+						<div class="feature-item">
+							<span class="feature-icon">📱</span>
+							<span>Mobile Friendly</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="auth-right">
+				<div class="auth-card">
+					<div class="auth-header">
+						<h2>Create Account</h2>
+						<p>Fill in your details to get started</p>
+					</div>
+			
+			<form id="signup-form" class="auth-form">
+				<div class="form-group">
+					<label for="name" class="required">Full Name</label>
+					<input type="text" id="name" name="name" required placeholder="Enter your full name">
+					<div class="error-message" id="name-error"></div>
+				</div>
+				
+				<div class="form-group">
+					<label for="email" class="required">Email Address</label>
+					<input type="email" id="email" name="email" required placeholder="Enter your email">
+					<div class="error-message" id="email-error"></div>
+				</div>
+				
+				<div class="form-group">
+					<label for="password" class="required">Password</label>
+					<div class="password-input">
+						<input type="password" id="password" name="password" required placeholder="Create a password">
+						<button type="button" class="password-toggle" id="password-toggle">👁️</button>
+					</div>
+					<div class="password-strength" id="password-strength">
+						<div class="strength-bar">
+							<div class="strength-fill" id="strength-fill"></div>
+						</div>
+						<div class="strength-text" id="strength-text">Password strength</div>
+					</div>
+					<div class="error-message" id="password-error"></div>
+				</div>
+
+				<div class="form-group">
+					<label for="confirm-password" class="required">Confirm Password</label>
+					<div class="password-input">
+						<input type="password" id="confirm-password" name="confirm-password" required placeholder="Confirm your password">
+						<button type="button" class="password-toggle" id="confirm-password-toggle">👁️</button>
+					</div>
+					<div class="error-message" id="confirm-password-error"></div>
+				</div>
+
+				<div class="form-group">
+					<div class="image-captcha-container">
+						<label for="image-captcha">Security Verification</label>
+						<p class="captcha-instruction">Click on the correct image to verify you're human</p>
+						<div class="image-captcha-grid" id="image-captcha-grid-signup">
+							<!-- Images will be generated here -->
+						</div>
+						<div class="captcha-actions">
+							<button type="button" class="captcha-refresh-btn" id="image-captcha-refresh-signup">
+								<span class="refresh-icon">🔄</span>
+								<span class="refresh-text">New Challenge</span>
+							</button>
+							<div class="captcha-status" id="captcha-status-signup">Select the correct image</div>
+						</div>
+						<div class="error-message" id="image-captcha-error-signup"></div>
+					</div>
+				</div>
+
+				<div class="form-options">
+					<label class="checkbox-label terms-checkbox">
+						<input type="checkbox" id="terms" required>
+						<span class="checkmark"></span>
+						<span class="terms-text">
+							I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>
+						</span>
+					</label>
+				</div>
+				
+				<button type="submit" class="auth-btn primary">
+					<span class="btn-text">Create Account</span>
+					<span class="btn-loading" id="signup-loading">⏳</span>
+				</button>
+			</form>
+			
+					<div class="auth-footer">
+						<p>Already have an account? <a href="login.html" class="auth-link">Sign In</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="email-service.js"></script>
+	<script src="auth.js"></script>
+	<script src="validation.js"></script>
+	<script>
+		// Enhanced signup form with improved validation
+		document.addEventListener('DOMContentLoaded', function() {
+			const form = document.getElementById('signup-form');
+			const passwordInput = document.getElementById('password');
+			const confirmPasswordInput = document.getElementById('confirm-password');
+			
+			// Password strength checker
+			function checkPasswordStrength(password) {
+				const strength = window.FormValidator.checkPasswordStrength(password);
+				const strengthText = document.getElementById('strength-text');
+				const strengthFill = document.getElementById('strength-fill');
+				
+				strengthText.textContent = password.length === 0 ? 'Password strength' : `Password strength: ${strength.level}`;
+				strengthFill.className = `strength-fill ${strength.level}`;
+			}
+			
+			// Password toggle functionality
+			document.getElementById('password-toggle').addEventListener('click', function() {
+				const passwordInput = document.getElementById('password');
+				const toggle = this;
+				if (passwordInput.type === 'password') {
+					passwordInput.type = 'text';
+					toggle.textContent = '🙈';
+				} else {
+					passwordInput.type = 'password';
+					toggle.textContent = '👁️';
+				}
+			});
+			
+			document.getElementById('confirm-password-toggle').addEventListener('click', function() {
+				const passwordInput = document.getElementById('confirm-password');
+				const toggle = this;
+				if (passwordInput.type === 'password') {
+					passwordInput.type = 'text';
+					toggle.textContent = '🙈';
+				} else {
+					passwordInput.type = 'password';
+					toggle.textContent = '👁️';
+				}
+			});
+			
+			// Real-time password strength checking
+			passwordInput.addEventListener('input', function() {
+				checkPasswordStrength(this.value);
+				window.FormValidator.updatePasswordStrength(this);
+			});
+			
+			// Real-time password confirmation checking
+			confirmPasswordInput.addEventListener('input', function() {
+				window.FormValidator.validateConfirmPassword(this);
+			});
+			
+			// Form submission with validation
+			form.addEventListener('submit', function(e) {
+				e.preventDefault();
+				
+				// Validate all fields
+				const isFormValid = window.FormValidator.validateForm(form);
+				
+				// Check captcha
+				if (!isCaptchaVerifiedSignup) {
+					window.FormValidator.showError(document.getElementById('image-captcha-grid-signup'), 'Please complete the security verification');
+					return;
+				}
+				
+				if (isFormValid) {
+					// Get form data
+					const formData = {
+						name: document.getElementById('name').value.trim(),
+						email: document.getElementById('email').value.trim().toLowerCase(),
+						password: document.getElementById('password').value
+					};
+					
+					// Show loading state
+					const submitBtn = form.querySelector('.auth-btn');
+					const originalText = submitBtn.querySelector('.btn-text').textContent;
+					submitBtn.querySelector('.btn-text').textContent = 'Creating Account...';
+					submitBtn.disabled = true;
+					
+					// Simulate registration
+					setTimeout(() => {
+						try {
+							// This would normally call the actual registration function
+							// For now, we'll just show success
+							alert('Account created successfully! Please sign in.');
+							window.location.href = 'login.html';
+						} catch (error) {
+							alert('Registration failed: ' + error.message);
+							submitBtn.querySelector('.btn-text').textContent = originalText;
+							submitBtn.disabled = false;
+						}
+					}, 1500);
+				}
+			});
+		});
+		
+		// Image-based Captcha System for Signup
+		let currentChallengeSignup = '';
+		let selectedImagesSignup = [];
+		let isCaptchaVerifiedSignup = false;
+		
+		const captchaChallengesSignup = [
+			{ question: "Select all images with cars", correctImages: ["🚗", "🚌", "🚙", "🚐"] },
+			{ question: "Select all images with trees", correctImages: ["🌳", "🌲", "🌿", "🌴"] },
+			{ question: "Select all images with buildings", correctImages: ["🏢", "🏪", "🏬", "🏭", "🏠", "🏘️", "🏡", "🏛️"] },
+			{ question: "Select all images with animals", correctImages: ["🐕", "🐱", "🐶", "🐰"] },
+			{ question: "Select all images with food", correctImages: ["🍕", "🍔", "🍎", "🍝"] }
+		];
+		
+		const captchaImagesSignup = [
+			"🚗", "🌳", "🏢", "🍕", "🐕", "🏠", "🚌", "🌲", "🏪", "🍔", "🐱", "🏡",
+			"🚙", "🌿", "🏬", "🍎", "🐶", "🏘️", "🚐", "🌴", "🏭", "🍝", "🐰", "🏛️"
+		];
+		
+		let currentCorrectIndicesSignup = [];
+		
+		function generateImageCaptchaSignup() {
+			const challenge = captchaChallengesSignup[Math.floor(Math.random() * captchaChallengesSignup.length)];
+			currentChallengeSignup = challenge;
+			selectedImagesSignup = [];
+			isCaptchaVerifiedSignup = false;
+			currentCorrectIndicesSignup = [];
+			
+			// Update instruction
+			document.querySelector('.captcha-instruction').textContent = challenge.question;
+			document.getElementById('captcha-status-signup').textContent = 'Select the correct images';
+			document.getElementById('captcha-status-signup').className = 'captcha-status';
+			
+			// Generate 6 images ensuring at least 2-3 correct images are included
+			const grid = document.getElementById('image-captcha-grid-signup');
+			grid.innerHTML = '';
+			
+			// First, select 2-3 correct images
+			const correctImagesToUse = challenge.correctImages.sort(() => Math.random() - 0.5).slice(0, Math.min(3, challenge.correctImages.length));
+			
+			// Then select 3-4 random other images
+			const otherImages = captchaImagesSignup.filter(img => !challenge.correctImages.includes(img));
+			const randomOtherImages = otherImages.sort(() => Math.random() - 0.5).slice(0, 6 - correctImagesToUse.length);
+			
+			// Combine and shuffle
+			const shuffledImages = [...correctImagesToUse, ...randomOtherImages].sort(() => Math.random() - 0.5);
+			
+			// Find which indices contain correct images
+			shuffledImages.forEach((image, index) => {
+				if (challenge.correctImages.includes(image)) {
+					currentCorrectIndicesSignup.push(index);
+				}
+			});
+			
+			shuffledImages.forEach((image, index) => {
+				const imageDiv = document.createElement('div');
+				imageDiv.className = 'captcha-image';
+				imageDiv.innerHTML = `<div class="image-content">${image}</div>`;
+				imageDiv.dataset.index = index;
+				
+				imageDiv.addEventListener('click', function() {
+					selectImageSignup(index, this);
+				});
+				
+				grid.appendChild(imageDiv);
+			});
+		}
+		
+		function selectImageSignup(index, element) {
+			if (isCaptchaVerifiedSignup) return;
+			
+			const isSelected = selectedImagesSignup.includes(index);
+			
+			if (isSelected) {
+				selectedImagesSignup = selectedImagesSignup.filter(i => i !== index);
+				element.classList.remove('selected');
+			} else {
+				selectedImagesSignup.push(index);
+				element.classList.add('selected');
+			}
+			
+			// Check if selection matches correct answers
+			const isCorrect = selectedImagesSignup.length === currentCorrectIndicesSignup.length && 
+							 selectedImagesSignup.every(i => currentCorrectIndicesSignup.includes(i));
+			
+			if (isCorrect && selectedImagesSignup.length > 0) {
+				isCaptchaVerifiedSignup = true;
+				document.getElementById('captcha-status-signup').textContent = '✓ Verification successful!';
+				document.getElementById('captcha-status-signup').className = 'captcha-status success';
+			} else if (selectedImagesSignup.length > 0) {
+				document.getElementById('captcha-status-signup').textContent = 'Please select all correct images';
+				document.getElementById('captcha-status-signup').className = 'captcha-status warning';
+			}
+		}
+		
+		// Initialize captcha
+		generateImageCaptchaSignup();
+		
+		// Refresh captcha
+		document.getElementById('image-captcha-refresh-signup').addEventListener('click', function() {
+			generateImageCaptchaSignup();
+			document.getElementById('image-captcha-error-signup').textContent = '';
+		});
+		
+		// Signup form
+		document.getElementById('signup-form').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			
+			const formData = new FormData(e.target);
+			const name = formData.get('name');
+			const email = formData.get('email');
+			const password = formData.get('password');
+			const confirmPassword = formData.get('confirm-password');
+			const loading = document.getElementById('signup-loading');
+			const btnText = document.querySelector('#signup-form .btn-text');
+			
+			// Clear previous errors
+			document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+			
+			// Validation
+			if (!name || name.length < 2) {
+				document.getElementById('name-error').textContent = 'Name must be at least 2 characters';
+				return;
+			}
+			
+			if (!email) {
+				document.getElementById('email-error').textContent = 'Email is required';
+				return;
+			}
+			
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailRegex.test(email)) {
+				document.getElementById('email-error').textContent = 'Please enter a valid email address';
+				return;
+			}
+			
+			if (!password || password.length < 8) {
+				document.getElementById('password-error').textContent = 'Password must be at least 8 characters';
+				return;
+			}
+			
+			if (password !== confirmPassword) {
+				document.getElementById('confirm-password-error').textContent = 'Passwords do not match';
+				return;
+			}
+			
+			// Validate image captcha
+			if (!isCaptchaVerifiedSignup) {
+				document.getElementById('image-captcha-error-signup').textContent = 'Please complete the image verification';
+				return;
+			}
+			
+			// Validate terms acceptance
+			const terms = document.getElementById('terms').checked;
+			if (!terms) {
+				alert('Please accept the Terms of Service and Privacy Policy');
+				return;
+			}
+			
+			loading.style.display = 'inline';
+			btnText.style.display = 'none';
+			
+			try {
+				await window.Auth.registerUser({ name, email, password });
+				alert('Account created successfully! Redirecting to login...');
+				setTimeout(() => {
+					window.location.href = 'login.html?registered=1';
+				}, 2000);
+			} catch (error) {
+				alert('Signup failed: ' + error.message);
+			} finally {
+				loading.style.display = 'none';
+				btnText.style.display = 'inline';
+			}
+		});
+		
+	</script>
+</body>
+</html>
